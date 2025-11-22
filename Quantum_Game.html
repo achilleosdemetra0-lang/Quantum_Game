@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Κβαντική Πιθανότητα - Το Κουίζ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    
+    <style>
+        /* Custom styles for the animation/Aesthetics */
+        body {
+            background-color: #f7fafc;
+        }
+        .step-transition {
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+        .hidden-step {
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+            height: 0;
+            overflow: hidden;
+            padding: 0;
+            margin: 0;
+        }
+<style>
+        /* ... (υπάρχοντες κανόνες) ... */
+        
+        /* 🎨 ΔΙΟΡΘΩΣΗ: Αφαίρεση εξωτερικών περιορισμών μεγέθους */
+        #chart-container {
+             /* Δεν χρειάζεται πλέον max-width/height εδώ */
+        }
+        #distributionChart {
+            /* Εξασφαλίζει ότι το canvas γεμίζει τον γονικό του wrapper (500x400) */
+            width: 100% !important; 
+            height: 100% !important;
+        }
+        /* ---------------------------------------------------- */
+    </style>
+</head>
+<body class="p-8">
+
+    <div class="max-w-4xl mx-auto bg-white shadow-xl rounded-lg p-6 sm:p-10">
+        <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">
+            🐱 Κβαντική Κατανομή & Διλήμματα
+        </h1>
+        <p class="text-center text-gray-600 mb-8">
+            Απαντήστε στις 5 ερωτήσεις. Το άθροισμα των επιλογών σας θα καθορίσει την τελική σας **"Κβαντική Κατάσταση"**.
+        </p>
+
+        <div id="quiz-container">
+            </div>
+
+        <div id="result-screen" class="hidden-step step-transition mt-10 p-6 border-t-2 border-indigo-200">
+            <h2 class="text-2xl font-semibold mb-4 text-center text-indigo-700">Η Τελική σας Κβαντική Κατάσταση</h2>
+            <div id="final-state" class="text-center text-4xl font-extrabold p-4 rounded-lg"></div>
+            <p id="state-text" class="text-center text-lg mt-4"></p>
+            <p class="text-center text-gray-500 mt-2">
+                Το αποτέλεσμα σας καταχωρήθηκε στη συλλογή. Δείτε πώς μοιάζει η συνολική κατανομή:
+            </p>
+        </div>
+
+       <div id="chart-container" class="hidden-step step-transition mt-8">
+            <h2 class="text-2xl font-semibold mb-4 text-center text-gray-700">Συνολική Κατανομή Μαθητών</h2>
+            
+            <div id="chart-wrapper" style="width: 500px; height: 400px; margin: 0 auto;">
+                <canvas id="distributionChart"></canvas>
+            </div>
+            
+            <p class="text-center text-sm text-gray-500 mt-4">
+                Παρατηρήστε πώς τα αποτελέσματα συγκεντρώνονται στο κέντρο (Καμπύλη Gauss).
+            </p>
+        </div>
+
+        <div id="explanation-section" class="hidden-step step-transition mt-10 p-6 bg-blue-50 rounded-lg shadow-inner">
+            <h3 class="text-xl font-bold text-blue-800 mb-3">Τι σημαίνει αυτό: Η Σύνδεση με την Κβαντομηχανική</h3>
+            <p class="text-gray-700 leading-relaxed">
+                Το πείραμα έδειξε ότι υπάρχουν πολλές διαφορετικές **καταστάσεις** (τα τελικά χρώματα) στις οποίες θα μπορούσατε να καταλήξετε.
+                Όπως η γάτα του Schrödinger βρίσκεται σε **υπέρθεση** (ζωντανή & πεθαμένη), έτσι και οι απαντήσεις σας ήταν σε υπέρθεση πιθανοτήτων μέχρι να επιλέξετε.
+            </p>
+            <p class="text-gray-700 leading-relaxed mt-2">
+                Η γραφική παράσταση 
+
+[Image of a Gaussian Curve]
+ δείχνει ότι παρόλο που ΟΛΕΣ οι καταστάσεις (όλα τα χρώματα) είναι **πιθανά**, οι καταστάσεις γύρω από το **κέντρο** είναι οι **ΠΙΟ ΠΙΘΑΝΕΣ** να συμβούν.
+            </p>
+            <p class="text-gray-700 leading-relaxed mt-2 font-semibold">
+                Αυτή είναι και η κεντρική ιδέα της Κβαντομηχανικής: **Όλες οι καταστάσεις είναι πιθανές, αλλά κάποιες έχουν μεγαλύτερο πλάτος πιθανότητας** (άρα είναι πιο πιθανές) **από κάποιες άλλες**.
+            </p>
+        </div>
+
+    </div>
+
+    <script>
+        // === 1. FIREBASE CONFIGURATION (ΠΡΕΠΕΙ ΝΑ ΑΝΤΙΚΑΤΑΣΤΗΣΕΤΕ ΤΙΣ ΠΑΡΑΚΑΤΩ ΚΕΝΕΣ ΤΙΜΕΣ) ===
+        const firebaseConfig = {
+            apiKey: "AIzaSyBSSwrrEqYrbXIOaPnqn_WznCjw1nfyEUM", // <-- ΑΝΤΙΚΑΤΑΣΤΑΣΗ
+            authDomain: "quantum-game-a4783.firebaseapp.com", // <-- ΑΝΤΙΚΑΤΑΣΤΑΣΗ
+            projectId: "quantum-game-a4783", // <-- ΑΝΤΙΚΑΤΑΣΤΑΣΗ
+            storageBucket: "quantum-game-a4783.firebasestorage.app", // <-- ΑΝΤΙΚΑΤΑΣΤΑΣΗ
+            messagingSenderId: "206264734992", // <-- ΑΝΤΙΚΑΤΑΣΤΑΣΗ
+            appId: "1:206264734992:web:1217edcea5a233bf350195", // <-- ΑΝΤΙΚΑΤΑΣΤΑΣΗ
+            measurementId: "G-DGZRK7315D" // <-- ΑΝΤΙΚΑΤΑΣΤΑΣΗ
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const resultsCollection = db.collection("quiz_results"); 
+        // ==============================================================
+
+        // === 2. ΚΒΑΝΤΙΚΕΣ ΕΡΩΤΗΣΕΙΣ ===
+        const questions = [
+            {
+                text: "Η γάτα του Schrödinger, αν υπήρχε αυτή τη στιγμή, θα ήταν...",
+                optionA: "Ζωντανή (Value 1)",
+                optionB: "Πεθαμένη (Value 0)"
+            },
+            {
+                text: "Αν ζητήσεις άδεια να πας τουαλέτα την ώρα του μαθήματος, η πιθανότητα είναι να...",
+                optionA: "Καταφέρεις να πας (Value 1)",
+                optionB: "Δεν καταφέρεις να πας (Value 0)"
+            },
+            {
+                text: "Αν έπεφτε ένας μετεωρίτης, θα έπεφτε κοντά σου...",
+                optionA: "Ναι, πολύ κοντά (Value 1)",
+                optionB: "Όχι, πολύ μακριά (Value 0)"
+            },
+            {
+                text: "Το αγαπημένο σου φαγητό θα είναι το σημερινό μεσημεριανό σου:",
+                optionA: "Ναι (Value 1)",
+                optionB: "Όχι (Value 0)"
+            },
+            {
+                text: "Αν έβρισκες $100$ ευρώ στο δρόμο, θα τα...",
+                optionA: "Κρατούσες (Value 1)",
+                optionB: "Παρέδιδες (Value 0)"
+            }
+        ];
+
+        // === 3. ΧΡΩΜΑΤΑ ΚΑΤΑΣΤΑΣΕΩΝ (Το "Μοναδικό Χρώμα" ανά αριθμό 1) ===
+        const stateColors = {
+            0: { name: "Σκοτεινό Μπλε (Ελάχιστη Πιθανότητα)", color: "bg-blue-900", text: "text-white" },
+            1: { name: "Βαθύ Μπλε (Χαμηλή Πιθανότητα)", color: "bg-blue-600", text: "text-white" },
+            2: { name: "Γαλάζιο (Μέτρια Πιθανότητα)", color: "bg-cyan-400", text: "text-gray-800" },
+            3: { name: "Λαχανί (Η ΠΙΟ ΠΙΘΑΝΗ Κατάσταση - Κορυφή)", color: "bg-lime-500", text: "text-gray-800" },
+            4: { name: "Κίτρινο (Μέτρια Πιθανότητα)", color: "bg-yellow-400", text: "text-gray-800" },
+            5: { name: "Κόκκινο (Ελάχιστη Πιθανότητα)", color: "bg-red-600", text: "text-white" }
+        };
+        const colorLabels = Object.keys(stateColors).map(key => `${key} - ${stateColors[key].name}`);
+
+        // === 4. GLOBAL STATE & QUIZ LOGIC ===
+        let currentQuestion = 0;
+        let answers = [];
+        const quizContainer = document.getElementById('quiz-container');
+
+        function renderQuestion() {
+            if (currentQuestion >= questions.length) {
+                return calculateResult();
+            }
+
+            const q = questions[currentQuestion];
+            const html = `
+                <div id="q-${currentQuestion}" class="question-step p-5 mb-6 border-2 border-gray-200 rounded-lg bg-gray-50 step-transition">
+                    <p class="text-xl font-semibold mb-4 text-gray-700">Ερώτηση ${currentQuestion + 1} από ${questions.length}:</p>
+                    <p class="text-2xl mb-6 font-medium">${q.text}</p>
+                    <div class="space-y-3">
+                        <button onclick="handleAnswer(1)" class="w-full py-3 px-4 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition duration-300">
+                            A: ${q.optionA}
+                        </button>
+                        <button onclick="handleAnswer(0)" class="w-full py-3 px-4 bg-yellow-500 text-gray-800 font-bold rounded-lg hover:bg-yellow-600 transition duration-300">
+                            B: ${q.optionB}
+                        </button>
+                    </div>
+                </div>
+            `;
+            quizContainer.innerHTML = html;
+        }
+
+        function handleAnswer(value) {
+            answers.push(value);
+            const currentStepElement = document.getElementById(`q-${currentQuestion}`);
+            if (currentStepElement) {
+                // Smoothly hide the current question
+                currentStepElement.classList.remove('question-step');
+                currentStepElement.classList.add('hidden-step');
+                
+                // Wait for the transition to finish before rendering the next
+                setTimeout(() => {
+                    currentQuestion++;
+                    renderQuestion();
+                }, 500); 
+            }
+        }
+
+        async function calculateResult() {
+            const finalState = answers.reduce((sum, value) => sum + value, 0);
+            const stateInfo = stateColors[finalState];
+
+            // Hide Quiz
+            quizContainer.classList.add('hidden-step');
+            quizContainer.style.height = '0'; // Ensure it collapses
+
+            // Show Result
+            const resultScreen = document.getElementById('result-screen');
+            const finalStateDiv = document.getElementById('final-state');
+            const stateText = document.getElementById('state-text');
+
+            finalStateDiv.innerHTML = `${finalState}/5 (${stateInfo.name})`;
+            finalStateDiv.classList.add(stateInfo.color, stateInfo.text);
+            stateText.innerHTML = `Ολοκληρώσατε με ${finalState} Επιλογές 'A'.`;
+            
+            resultScreen.classList.remove('hidden-step');
+            resultScreen.style.height = 'auto'; 
+            resultScreen.style.padding = '1.5rem'; // Reapply padding
+
+            // Save result to Firestore
+            await saveResult(finalState);
+
+            // Show Chart and Explanation
+            await loadAndDrawChart();
+            
+            document.getElementById('chart-container').classList.remove('hidden-step');
+            document.getElementById('chart-container').style.height = 'auto';
+            
+            document.getElementById('explanation-section').classList.remove('hidden-step');
+            document.getElementById('explanation-section').style.height = 'auto';
+            document.getElementById('explanation-section').style.padding = '1.5rem'; // Reapply padding
+        }
+
+        // === 5. FIREBASE/FIRESTORE OPERATIONS ===
+        async function saveResult(state) {
+            try {
+                await resultsCollection.add({
+                    state: state,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch (error) {
+                console.error("Error writing document: ", error);
+            }
+        }
+
+        // === 6. CHART.JS DRAWING ===
+        let distributionChart;
+
+        async function loadAndDrawChart() {
+            // Fetch all results
+            const snapshot = await resultsCollection.get();
+            const results = snapshot.docs.map(doc => doc.data().state);
+
+            // Aggregate data (count occurrences of 0, 1, 2, 3, 4, 5)
+            const dataCounts = [0, 0, 0, 0, 0, 0]; 
+            results.forEach(state => {
+                if (state >= 0 && state <= 5) {
+                    dataCounts[state]++;
+                }
+            });
+
+            // Destroy existing chart if it exists
+            if (distributionChart) {
+                distributionChart.destroy();
+            }
+
+            // Define chart data and configuration
+            const ctx = document.getElementById('distributionChart').getContext('2d');
+            distributionChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: colorLabels,
+                    datasets: [{
+                        label: 'Πλήθος Αποτελεσμάτων (Μαθητές)',
+                        data: dataCounts,
+                        backgroundColor: [
+                            stateColors[0].color.replace('bg-', '#').replace('#', 'rgba(30, 58, 138, 0.8)'), // blue-900
+                            stateColors[1].color.replace('bg-', '#').replace('#', 'rgba(37, 99, 235, 0.8)'), // blue-600
+                            stateColors[2].color.replace('bg-', '#').replace('#', 'rgba(34, 211, 238, 0.8)'), // cyan-400
+                            stateColors[3].color.replace('bg-', '#').replace('#', 'rgba(132, 204, 22, 0.9)'), // lime-500 (Peak)
+                            stateColors[4].color.replace('bg-', '#').replace('#', 'rgba(251, 191, 36, 0.8)'), // yellow-400
+                            stateColors[5].color.replace('bg-', '#').replace('#', 'rgba(220, 38, 38, 0.8)'), // red-600
+                        ],
+                        borderColor: '#1f2937',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Allows flexible height/width
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Συχνότητα'
+                            },
+                            ticks: {
+                                precision: 0 // Ensure integer ticks for count
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Κβαντική Κατάσταση (Αριθμός Επιλογών "A")'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Απεικόνιση Κανονικής Κατανομής (Bell Curve)'
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Listen for real-time updates from Firestore
+        resultsCollection.onSnapshot(snapshot => {
+            // Only attempt to update if the result screen is visible
+            const resultScreen = document.getElementById('result-screen');
+            if (resultScreen && resultScreen.classList.contains('hidden-step')) {
+                return;
+            }
+            loadAndDrawChart();
+        }, err => {
+            console.error(`Encountered error: ${err}`);
+        });
+
+        // === 7. INITIALIZATION ===
+        document.addEventListener('DOMContentLoaded', renderQuestion);
+    </script>
+</body>
+</html>
