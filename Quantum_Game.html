@@ -14,28 +14,34 @@
         body {
             background-color: #f7fafc;
         }
+        
+        /* 1. ΝΕΟ CSS ΓΙΑ ΣΥΜΒΑΤΟΤΗΤΑ ΚΙΝΗΤΩΝ & ΟΜΑΛΗ ΜΕΤΑΒΑΣΗ */
         .step-transition {
-            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            /* Προσθέτουμε τη μετάβαση και στο height για ομαλή εμφάνιση/εξαφάνιση */
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out, height 0.5s ease-in-out; 
         }
+        
         .hidden-step {
             opacity: 0;
             transform: translateY(20px);
             pointer-events: none;
             height: 0;
             overflow: hidden;
-            padding: 0;
-            margin: 0;
+            padding: 0 !important; /* Χρήση !important για να παρακάμψουμε το Tailwind */
+            margin: 0 !important;
+            /* Κρύβει το στοιχείο εντελώς μετά την μετάβαση */
+            display: none !important; 
         }
-<style>
-        /* ... (υπάρχοντες κανόνες) ... */
+
+        .visible-step {
+            /* Επιτρέπει στο στοιχείο να εμφανιστεί με τη μετάβαση */
+            display: block !important;
+        }
         
-        /* 🎨 ΔΙΟΡΘΩΣΗ: Αφαίρεση εξωτερικών περιορισμών μεγέθους */
-        #chart-container {
-             /* Δεν χρειάζεται πλέον max-width/height εδώ */
-        }
+        /* ΔΙΟΡΘΩΣΗ: Αφαίρεση εξωτερικών περιορισμών μεγέθους */
         #distributionChart {
-            /* Εξασφαλίζει ότι το canvas γεμίζει τον γονικό του wrapper (500x400) */
-            width: 100% !important; 
+            /* Εξασφαλίζει ότι το canvas γεμίζει τον γονικό του wrapper */
+            width: 100% !important; 
             height: 100% !important;
         }
         /* ---------------------------------------------------- */
@@ -45,29 +51,29 @@
 
     <div class="max-w-4xl mx-auto bg-white shadow-xl rounded-lg p-6 sm:p-10">
         <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">
-            🐱 Κβαντική Κατανομή & Διλήμματα
-        </h1>
+            🐱 Κβαντική Κατανομή & Διλήμματα
+        </h1>
 
-                <div id="intro-screen" class="p-6 bg-indigo-50 border-2 border-indigo-200 rounded-lg mb-8">
-            <h2 class="text-2xl font-semibold text-indigo-700 mb-3">Τι Παίζουμε; Η Λογική της Πιθανότητας</h2>
-            
-                        <p class="text-center text-gray-700 leading-relaxed font-bold mb-4">
-                Απαντήστε στις 5 ερωτήσεις. Το άθροισμα των επιλογών σας θα καθορίσει την τελική σας **"Κβαντική Κατάσταση"**.
-            </p>
+        <div id="intro-screen" class="visible-step p-6 bg-indigo-50 border-2 border-indigo-200 rounded-lg mb-8 step-transition">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-3">Τι Παίζουμε; Η Λογική της Πιθανότητας</h2>
+            
+            <p class="text-center text-gray-700 leading-relaxed font-bold mb-4">
+                Απαντήστε στις 5 ερωτήσεις. Το άθροισμα των επιλογών σας θα καθορίσει την τελική σας **"Κβαντική Κατάσταση"**.
+            </p>
 
-            <p class="text-gray-700 leading-relaxed mb-4">
-                Το παιχνίδι αυτό είναι μια αναπαράσταση του **Πλάτους Πιθανότητας** στην Κβαντομηχανική. Όπως ένα κβαντικό σωματίδιο έχει πολλές πιθανές θέσεις (**Υπέρθεση**) μέχρι να το παρατηρήσουμε, έτσι και εσείς έχετε πολλές πιθανές τελικές καταστάσεις.
-            </p>
-            <p class="text-gray-700 leading-relaxed mb-4 font-bold">
-                Σκοπός μας είναι να δούμε αν η κατανομή των απαντήσεων της τάξης (η συχνότητα) θα ακολουθήσει την **Καμπύλη Gauss**. Αυτή η καμπύλη δείχνει ότι, ενώ όλα είναι πιθανά, οι καταστάσεις γύρω από το **μέσο** είναι οι πιο συχνές.
-            </p>
-            <button onclick="startQuiz()" class="w-full py-3 px-4 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition duration-300 shadow-md">
-                ▶️ Έναρξη Κβαντικού Πειράματος
-            </button>
-        </div>
+            <p class="text-gray-700 leading-relaxed mb-4">
+                Το παιχνίδι αυτό είναι μια αναπαράσταση του **Πλάτους Πιθανότητας** στην Κβαντομηχανική. Όπως ένα κβαντικό σωματίδιο έχει πολλές πιθανές θέσεις (**Υπέρθεση**) μέχρι να το παρατηρήσουμε, έτσι και εσείς έχετε πολλές πιθανές τελικές καταστάσεις.
+            </p>
+            <p class="text-gray-700 leading-relaxed mb-4 font-bold">
+                Σκοπός μας είναι να δούμε αν η κατανομή των απαντήσεων της τάξης (η συχνότητα) θα ακολουθήσει την **Καμπύλη Gauss**. Αυτή η καμπύλη δείχνει ότι, ενώ όλα είναι πιθανά, οι καταστάσεις γύρω από το **μέσο** είναι οι πιο συχνές.
+            </p>
+            <button onclick="startQuiz()" class="w-full py-3 px-4 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition duration-300 shadow-md">
+                ▶️ Έναρξη Κβαντικού Πειράματος
+            </button>
+        </div>
 
-                <div id="quiz-container" class="hidden-step step-transition">
-                    </div>
+        <div id="quiz-container" class="hidden-step step-transition">
+        </div>
 
         <div id="result-screen" class="hidden-step step-transition mt-10 p-6 border-t-2 border-indigo-200">
             <h2 class="text-2xl font-semibold mb-4 text-center text-indigo-700">Η Τελική σας Κβαντική Κατάσταση</h2>
@@ -78,10 +84,10 @@
             </p>
         </div>
 
-       <div id="chart-container" class="hidden-step step-transition mt-8">
+        <div id="chart-container" class="hidden-step step-transition mt-8">
             <h2 class="text-2xl font-semibold mb-4 text-center text-gray-700">Συνολική Κατανομή Μαθητών</h2>
             
-            <div id="chart-wrapper" style="width: 500px; height: 400px; margin: 0 auto;">
+            <div id="chart-wrapper" style="width: 100%; max-width: 500px; height: 400px; margin: 0 auto;">
                 <canvas id="distributionChart"></canvas>
             </div>
             
@@ -112,19 +118,19 @@
     <script>
         // === 1. FIREBASE CONFIGURATION (ΠΡΕΠΕΙ ΝΑ ΑΝΤΙΚΑΤΑΣΤΗΣΕΤΕ ΤΙΣ ΠΑΡΑΚΑΤΩ ΚΕΝΕΣ ΤΙΜΕΣ) ===
         const firebaseConfig = {
-            apiKey: "AIzaSyBSSwrrEqYrbXIOaPnqn_WznCjw1nfyEUM", // <-- ΑΝΤΙΚΑΤΑΣΤΑΣΗ
-            authDomain: "quantum-game-a4783.firebaseapp.com", // <-- ΑΝΤΙΚΑΤΑΣΤΑΣΗ
-            projectId: "quantum-game-a4783", // <-- ΑΝΤΙΚΑΤΑΣΤΑΣΗ
-            storageBucket: "quantum-game-a4783.firebasestorage.app", // <-- ΑΝΤΙΚΑΤΑΣΤΑΣΗ
-            messagingSenderId: "206264734992", // <-- ΑΝΤΙΚΑΤΑΣΤΑΣΗ
-            appId: "1:206264734992:web:1217edcea5a233bf350195", // <-- ΑΝΤΙΚΑΤΑΣΤΑΣΗ
-            measurementId: "G-DGZRK7315D" // <-- ΑΝΤΙΚΑΤΑΣΤΑΣΗ
+            apiKey: "AIzaSyBSSwrrEqYrbXIOaPnqn_WznCjw1nfyEUM", 
+            authDomain: "quantum-game-a4783.firebaseapp.com", 
+            projectId: "quantum-game-a4783", 
+            storageBucket: "quantum-game-a4783.firebasestorage.app", 
+            messagingSenderId: "206264734992", 
+            appId: "1:206264734992:web:1217edcea5a233bf350195", 
+            measurementId: "G-DGZRK7315D" 
         };
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        const resultsCollection = db.collection("quiz_results"); 
+        const resultsCollection = db.collection("quiz_results"); 
         // ==============================================================
 
         // === 2. ΚΒΑΝΤΙΚΕΣ ΕΡΩΤΗΣΕΙΣ ===
@@ -156,7 +162,7 @@
             }
         ];
 
-        // === 3. ΧΡΩΜΑΤΑ ΚΑΤΑΣΤΑΣΕΩΝ (Το "Μοναδικό Χρώμα" ανά αριθμό 1) ===
+        // === 3. ΧΡΩΜΑΤΑ ΚΑΤΑΣΤΑΣΕΩΝ ===
         const stateColors = {
             0: { name: "Σκοτεινό Μπλε (Ελάχιστη Πιθανότητα)", color: "bg-blue-900", text: "text-white" },
             1: { name: "Βαθύ Μπλε (Χαμηλή Πιθανότητα)", color: "bg-blue-600", text: "text-white" },
@@ -167,76 +173,81 @@
         };
         const colorLabels = Object.keys(stateColors).map(key => `${key} - ${stateColors[key].name}`);
 
-     // === 4. GLOBAL STATE & QUIZ LOGIC ===
-        let currentQuestion = 0;
-        let answers = [];
-        const quizContainer = document.getElementById('quiz-container');
+       // === 4. GLOBAL STATE & QUIZ LOGIC ===
+        let currentQuestion = 0;
+        let answers = [];
+        const quizContainer = document.getElementById('quiz-container');
 
-        function startQuiz() {
-            const introScreen = document.getElementById('intro-screen');
-            
-            // 1. Κρύβουμε την εισαγωγική οθόνη
-            introScreen.classList.add('hidden-step');
-            setTimeout(() => {
-                introScreen.style.height = '0';
-                introScreen.style.padding = '0';
-                introScreen.style.marginBottom = '0';
-            }, 500); 
+        // 3. ΔΙΟΡΘΩΣΗ JS: Χρήση visible-step
+        function startQuiz() {
+            const introScreen = document.getElementById('intro-screen');
+            
+            // 1. Κρύβουμε την εισαγωγική οθόνη (πρώτα την κρύβουμε οπτικά, μετά την αφαιρούμε εντελώς)
+            introScreen.classList.remove('visible-step'); 
+            introScreen.classList.add('hidden-step');
+            
+            setTimeout(() => {
+                // Αυτό αφαιρεί τον χώρο αφού τελειώσει το transition
+                introScreen.style.height = '0';
+            }, 500); 
 
-            // 2. Εμφανίζουμε το quiz container
-            setTimeout(() => {
-                quizContainer.classList.remove('hidden-step');
-                quizContainer.style.height = 'auto'; 
-                renderQuestion(); // 3. Φόρτωση 1ης Ερώτησης
-            }, 500);
-        }
+            // 2. Εμφανίζουμε το quiz container
+            setTimeout(() => {
+                quizContainer.classList.add('visible-step'); // Το κάνουμε display: block
+                quizContainer.classList.remove('hidden-step'); // Αρχίζει το transition
+                quizContainer.style.height = 'auto'; 
+                renderQuestion(); // 3. Φόρτωση 1ης Ερώτησης
+            }, 500);
+        }
 
-        function renderQuestion() {
-            if (currentQuestion >= questions.length) {
-                return calculateResult();
-            }
+        function renderQuestion() {
+            if (currentQuestion >= questions.length) {
+                return calculateResult();
+            }
 
-            const q = questions[currentQuestion];
-            const html = `
-                <div id="q-${currentQuestion}" class="question-step p-5 mb-6 border-2 border-gray-200 rounded-lg bg-gray-50 step-transition">
-                    <p class="text-xl font-semibold mb-4 text-gray-700">Ερώτηση ${currentQuestion + 1} από ${questions.length}:</p>
-                    <p class="text-2xl mb-6 font-medium">${q.text}</p>
-                    <div class="space-y-3">
-                        <button onclick="handleAnswer(1)" class="w-full py-3 px-4 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition duration-300">
-                            A: ${q.optionA}
-                        </button>
-                        <button onclick="handleAnswer(0)" class="w-full py-3 px-4 bg-yellow-500 text-gray-800 font-bold rounded-lg hover:bg-yellow-600 transition duration-300">
-                            B: ${q.optionB}
-                        </button>
-                    </div>
-                </div>
-            `;
-            quizContainer.innerHTML = html;
-        }
+            const q = questions[currentQuestion];
+            // ... (HTML της ερώτησης)
+            const html = `
+                <div id="q-${currentQuestion}" class="question-step p-5 mb-6 border-2 border-gray-200 rounded-lg bg-gray-50 step-transition visible-step">
+                    <p class="text-xl font-semibold mb-4 text-gray-700">Ερώτηση ${currentQuestion + 1} από ${questions.length}:</p>
+                    <p class="text-2xl mb-6 font-medium">${q.text}</p>
+                    <div class="space-y-3">
+                        <button onclick="handleAnswer(1)" class="w-full py-3 px-4 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition duration-300">
+                            A: ${q.optionA}
+                        </button>
+                        <button onclick="handleAnswer(0)" class="w-full py-3 px-4 bg-yellow-500 text-gray-800 font-bold rounded-lg hover:bg-yellow-600 transition duration-300">
+                            B: ${q.optionB}
+                        </button>
+                    </div>
+                </div>
+            `;
+            quizContainer.innerHTML = html;
+        }
 
-        function handleAnswer(value) {
-            answers.push(value);
-            const currentStepElement = document.getElementById(`q-${currentQuestion}`);
-            if (currentStepElement) {
-                // Smoothly hide the current question
-                currentStepElement.classList.remove('question-step');
-                currentStepElement.classList.add('hidden-step');
-                
-                // Wait for the transition to finish before rendering the next
-                setTimeout(() => {
-                    currentQuestion++;
-                    renderQuestion();
-                }, 500); 
-            }
-        }
+        function handleAnswer(value) {
+            answers.push(value);
+            const currentStepElement = document.getElementById(`q-${currentQuestion}`);
+            if (currentStepElement) {
+                // Smoothly hide the current question
+                currentStepElement.classList.remove('visible-step'); // ΝΕΑ ΠΡΟΣΘΗΚΗ
+                currentStepElement.classList.add('hidden-step');
+                
+                // Wait for the transition to finish before rendering the next
+                setTimeout(() => {
+                    currentQuestion++;
+                    renderQuestion();
+                }, 500); 
+            }
+        }
 
         async function calculateResult() {
             const finalState = answers.reduce((sum, value) => sum + value, 0);
             const stateInfo = stateColors[finalState];
 
             // Hide Quiz
+            quizContainer.classList.remove('visible-step'); // ΝΕΑ ΠΡΟΣΘΗΚΗ
             quizContainer.classList.add('hidden-step');
-            quizContainer.style.height = '0'; // Ensure it collapses
+            quizContainer.style.height = '0'; 
 
             // Show Result
             const resultScreen = document.getElementById('result-screen');
@@ -247,9 +258,10 @@
             finalStateDiv.classList.add(stateInfo.color, stateInfo.text);
             stateText.innerHTML = `Ολοκληρώσατε με ${finalState} Επιλογές 'A'.`;
             
+            resultScreen.classList.add('visible-step'); // ΝΕΑ ΠΡΟΣΘΗΚΗ
             resultScreen.classList.remove('hidden-step');
-            resultScreen.style.height = 'auto'; 
-            resultScreen.style.padding = '1.5rem'; // Reapply padding
+            resultScreen.style.height = 'auto'; 
+            resultScreen.style.padding = '1.5rem'; 
 
             // Save result to Firestore
             await saveResult(finalState);
@@ -257,12 +269,16 @@
             // Show Chart and Explanation
             await loadAndDrawChart();
             
-            document.getElementById('chart-container').classList.remove('hidden-step');
-            document.getElementById('chart-container').style.height = 'auto';
+            const chartContainer = document.getElementById('chart-container');
+            chartContainer.classList.add('visible-step'); // ΝΕΑ ΠΡΟΣΘΗΚΗ
+            chartContainer.classList.remove('hidden-step');
+            chartContainer.style.height = 'auto';
             
-            document.getElementById('explanation-section').classList.remove('hidden-step');
-            document.getElementById('explanation-section').style.height = 'auto';
-            document.getElementById('explanation-section').style.padding = '1.5rem'; // Reapply padding
+            const explanationSection = document.getElementById('explanation-section');
+            explanationSection.classList.add('visible-step'); // ΝΕΑ ΠΡΟΣΘΗΚΗ
+            explanationSection.classList.remove('hidden-step');
+            explanationSection.style.height = 'auto';
+            explanationSection.style.padding = '1.5rem';
         }
 
         // === 5. FIREBASE/FIRESTORE OPERATIONS ===
@@ -286,7 +302,7 @@
             const results = snapshot.docs.map(doc => doc.data().state);
 
             // Aggregate data (count occurrences of 0, 1, 2, 3, 4, 5)
-            const dataCounts = [0, 0, 0, 0, 0, 0]; 
+            const dataCounts = [0, 0, 0, 0, 0, 0]; 
             results.forEach(state => {
                 if (state >= 0 && state <= 5) {
                     dataCounts[state]++;
@@ -365,9 +381,6 @@
             console.error(`Encountered error: ${err}`);
         });
 
-// === 7. INITIALIZATION (Το quiz ξεκινάει με το κλικ στο startQuiz) ===
-        // Δεν χρειάζεται να καλέσουμε το renderQuestion εδώ
-    </script>
+    </script>
 </body>
 </html>
-
