@@ -152,49 +152,68 @@
         };
         const colorLabels = Object.keys(stateColors).map(key => `${key} - ${stateColors[key].name}`);
 
-        // === 4. GLOBAL STATE & QUIZ LOGIC ===
-        let currentQuestion = 0;
-        let answers = [];
-        const quizContainer = document.getElementById('quiz-container');
+     // === 4. GLOBAL STATE & QUIZ LOGIC ===
+        let currentQuestion = 0;
+        let answers = [];
+        const quizContainer = document.getElementById('quiz-container');
 
-        function renderQuestion() {
-            if (currentQuestion >= questions.length) {
-                return calculateResult();
-            }
+        function startQuiz() {
+            const introScreen = document.getElementById('intro-screen');
+            
+            // 1. Κρύβουμε την εισαγωγική οθόνη
+            introScreen.classList.add('hidden-step');
+            setTimeout(() => {
+                introScreen.style.height = '0';
+                introScreen.style.padding = '0';
+                introScreen.style.marginBottom = '0';
+            }, 500); 
 
-            const q = questions[currentQuestion];
-            const html = `
-                <div id="q-${currentQuestion}" class="question-step p-5 mb-6 border-2 border-gray-200 rounded-lg bg-gray-50 step-transition">
-                    <p class="text-xl font-semibold mb-4 text-gray-700">Ερώτηση ${currentQuestion + 1} από ${questions.length}:</p>
-                    <p class="text-2xl mb-6 font-medium">${q.text}</p>
-                    <div class="space-y-3">
-                        <button onclick="handleAnswer(1)" class="w-full py-3 px-4 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition duration-300">
-                            A: ${q.optionA}
-                        </button>
-                        <button onclick="handleAnswer(0)" class="w-full py-3 px-4 bg-yellow-500 text-gray-800 font-bold rounded-lg hover:bg-yellow-600 transition duration-300">
-                            B: ${q.optionB}
-                        </button>
-                    </div>
-                </div>
-            `;
-            quizContainer.innerHTML = html;
-        }
+            // 2. Εμφανίζουμε το quiz container
+            setTimeout(() => {
+                quizContainer.classList.remove('hidden-step');
+                quizContainer.style.height = 'auto'; 
+                renderQuestion(); // 3. Φόρτωση 1ης Ερώτησης
+            }, 500);
+        }
 
-        function handleAnswer(value) {
-            answers.push(value);
-            const currentStepElement = document.getElementById(`q-${currentQuestion}`);
-            if (currentStepElement) {
-                // Smoothly hide the current question
-                currentStepElement.classList.remove('question-step');
-                currentStepElement.classList.add('hidden-step');
-                
-                // Wait for the transition to finish before rendering the next
-                setTimeout(() => {
-                    currentQuestion++;
-                    renderQuestion();
-                }, 500); 
-            }
-        }
+        function renderQuestion() {
+            if (currentQuestion >= questions.length) {
+                return calculateResult();
+            }
+
+            const q = questions[currentQuestion];
+            const html = `
+                <div id="q-${currentQuestion}" class="question-step p-5 mb-6 border-2 border-gray-200 rounded-lg bg-gray-50 step-transition">
+                    <p class="text-xl font-semibold mb-4 text-gray-700">Ερώτηση ${currentQuestion + 1} από ${questions.length}:</p>
+                    <p class="text-2xl mb-6 font-medium">${q.text}</p>
+                    <div class="space-y-3">
+                        <button onclick="handleAnswer(1)" class="w-full py-3 px-4 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 transition duration-300">
+                            A: ${q.optionA}
+                        </button>
+                        <button onclick="handleAnswer(0)" class="w-full py-3 px-4 bg-yellow-500 text-gray-800 font-bold rounded-lg hover:bg-yellow-600 transition duration-300">
+                            B: ${q.optionB}
+                        </button>
+                    </div>
+                </div>
+            `;
+            quizContainer.innerHTML = html;
+        }
+
+        function handleAnswer(value) {
+            answers.push(value);
+            const currentStepElement = document.getElementById(`q-${currentQuestion}`);
+            if (currentStepElement) {
+                // Smoothly hide the current question
+                currentStepElement.classList.remove('question-step');
+                currentStepElement.classList.add('hidden-step');
+                
+                // Wait for the transition to finish before rendering the next
+                setTimeout(() => {
+                    currentQuestion++;
+                    renderQuestion();
+                }, 500); 
+            }
+        }
 
         async function calculateResult() {
             const finalState = answers.reduce((sum, value) => sum + value, 0);
@@ -331,8 +350,8 @@
             console.error(`Encountered error: ${err}`);
         });
 
-        // === 7. INITIALIZATION ===
-        document.addEventListener('DOMContentLoaded', renderQuestion);
-    </script>
+// === 7. INITIALIZATION (Το quiz ξεκινάει με το κλικ στο startQuiz) ===
+        // Δεν χρειάζεται να καλέσουμε το renderQuestion εδώ
+    </script>
 </body>
 </html>
