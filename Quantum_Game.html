@@ -45,14 +45,29 @@
 
     <div class="max-w-4xl mx-auto bg-white shadow-xl rounded-lg p-6 sm:p-10">
         <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">
-            🐱 Κβαντική Κατανομή & Διλήμματα
-        </h1>
-        <p class="text-center text-gray-600 mb-8">
-            Απαντήστε στις 5 ερωτήσεις. Το άθροισμα των επιλογών σας θα καθορίσει την τελική σας **"Κβαντική Κατάσταση"**.
-        </p>
+            🐱 Κβαντική Κατανομή & Διλήμματα
+        </h1>
 
-        <div id="quiz-container">
-            </div>
+                <div id="intro-screen" class="p-6 bg-indigo-50 border-2 border-indigo-200 rounded-lg mb-8">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-3">Τι Παίζουμε; Η Λογική της Πιθανότητας</h2>
+            
+                        <p class="text-center text-gray-700 leading-relaxed font-bold mb-4">
+                Απαντήστε στις 5 ερωτήσεις. Το άθροισμα των επιλογών σας θα καθορίσει την τελική σας **"Κβαντική Κατάσταση"**.
+            </p>
+
+            <p class="text-gray-700 leading-relaxed mb-4">
+                Το παιχνίδι αυτό είναι μια αναπαράσταση του **Πλάτους Πιθανότητας** στην Κβαντομηχανική. Όπως ένα κβαντικό σωματίδιο έχει πολλές πιθανές θέσεις (**Υπέρθεση**) μέχρι να το παρατηρήσουμε, έτσι και εσείς έχετε πολλές πιθανές τελικές καταστάσεις.
+            </p>
+            <p class="text-gray-700 leading-relaxed mb-4 font-bold">
+                Σκοπός μας είναι να δούμε αν η κατανομή των απαντήσεων της τάξης (η συχνότητα) θα ακολουθήσει την **Καμπύλη Gauss**. Αυτή η καμπύλη δείχνει ότι, ενώ όλα είναι πιθανά, οι καταστάσεις γύρω από το **μέσο** είναι οι πιο συχνές.
+            </p>
+            <button onclick="startQuiz()" class="w-full py-3 px-4 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition duration-300 shadow-md">
+                ▶️ Έναρξη Κβαντικού Πειράματος
+            </button>
+        </div>
+
+                <div id="quiz-container" class="hidden-step step-transition">
+                    </div>
 
         <div id="result-screen" class="hidden-step step-transition mt-10 p-6 border-t-2 border-indigo-200">
             <h2 class="text-2xl font-semibold mb-4 text-center text-indigo-700">Η Τελική σας Κβαντική Κατάσταση</h2>
@@ -355,3 +370,4 @@
     </script>
 </body>
 </html>
+
